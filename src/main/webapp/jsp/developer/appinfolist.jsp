@@ -125,15 +125,43 @@
         <table id="datatable" class="table table-striped table-bordered">
         <thead>
         <tr>
-            <th>软件名称</th>
-            <th>APP名称</th>
-            <th>软件大小（单位：M）</th>
-            <th>所属平台</th>
-            <th>所属分类（一级分类、二级分类、三级分类）</th>
-            <th>状态</th>
-            <th>下载次数</th>
-            <th>最新版本号</th>
-            <th width="125px">操作</th>
+            <th class="sorting_asc" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="First name: activate to sort column descending"
+                aria-sort="ascending">软件名称</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                APK名称</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                软件大小(单位:M)</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                所属平台</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                所属分类(一级分类、二级分类、三级分类)</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                状态</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                下载次数</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                aria-label="Last name: activate to sort column ascending">
+                最新版本号</th>
+            <th class="sorting" tabindex="0"
+                aria-controls="datatable-responsive" rowspan="1" colspan="1"
+                style="width: 125px;"
+                aria-label="Last name: activate to sort column ascending">
+                操作</th>
         </tr>
         </thead>
 
@@ -145,7 +173,7 @@
                     <td>${appinfo.softwareSize}</td>
                     <td>${appinfo.flatformName}</td>
                     <td>${appinfo.categoryLevel1Name}->${appinfo.categoryLevel2Name}->${appinfo.categoryLevel3Name} </td>
-                    <td>${appinfo.statusName}</td>
+                    <td><span id="appInfoStatus${appinfo.id}">${appinfo.statusName}</span></td>
                     <td>${appinfo.downloads}</td>
                     <td>${appinfo.versionNo}</td>
                     <td><div class="btn-group">
@@ -157,17 +185,54 @@
                         <ul class="dropdown-menu" role="menu">
                             <li><c:choose>
                                 <c:when test="${appinfo.status == 5 || appinfo.status == 2}">
-                                    <a href="#">上架</a>
+                                    <a class="saleSwichOpen"
+                                       saleSwitch="open"
+                                       appinfoid="${appinfo.id }"
+                                       appsoftwarename="${appinfo.softwareName }"
+                                       data-toggle="tooltip"
+                                       data-placement="top"
+                                       title="" data-original-title="恭喜您，您的审核已经通过，您可以点击上架发布您的APP">上架</a>
                                 </c:when>
                                 <c:when test="${appinfo.status == 4}">
-                                    <a href="#">下架</a>
+                                    <a class="saleSwichClose"
+                                       saleSwitch="close"
+                                       appinfoid="${appinfo.id }"
+                                       appsoftwarename="${appinfo.softwareName }"
+                                       data-toggle="tooltip"
+                                       data-placement="top"
+                                       title="" data-original-title="您可以点击下架来停止发布您的APP，市场将不提供APP的下载">下架</a>
                                 </c:when>
                             </c:choose></li>
-                            <li><a href="#">新增版本</a></li>
-                            <li><a href="#">修改版本</a></li>
-                            <li><a href="#">修改</a></li>
-                            <li><a href="#">查看</a></li>
-                            <li><a href="#">删除</a></li>
+                            </li>
+                            <li><a class="addVersion"
+                                   appinfoid="${appinfo.id}"
+                                   data-toggle="tooltip"
+                                   data-placement="top"
+                                   title=""
+                                   data-original-title="新增APP版本信息">新增版本</a>
+                            </li>
+                            <li><a class="modifyVersion"
+                                   appinfoid="${appinfo.id }" versionid="${appinfo.versionId }" status="${appinfo.status }"
+                                   statusname="${appinfo.statusName }"
+                                   data-toggle="tooltip" data-placement="top" title="" data-original-title="修改APP最新版本信息">修改版本</a>
+                            </li>
+                            <li><a  class="modifyAppInfo" href="#"
+                                    appinfoid="${appinfo.id}"
+                                    status="${appinfo.status }"
+                                    statusname="${appinfo.statusName }"
+                                    data-toggle="tooltip"
+                                    data-placement="top" title="" data-original-title="修改APP基础信息">修改</a></li>
+                            <li><a  class="viewApp"
+                                    appinfoid="${appinfo.id }"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="" data-original-title="查看APP基础信息以及全部版本信息">查看</a></li>
+                            <li><a  class="deleteApp"
+                                    appinfoid="${appinfo.id}"
+                                    appsoftwarename="${appinfo.softwareName }"
+                                    data-toggle="tooltip"
+                                    data-placement="top"
+                                    title="" data-original-title="删除APP基础信息以及全部版本信息">删除</a></li>
                         </ul>
                     </div></td>
                 </tr>

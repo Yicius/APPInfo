@@ -1,16 +1,22 @@
 package cn.appsys.service.developer;
 
 import cn.appsys.dao.appinfo.AppInfoMapper;
+import cn.appsys.dao.appversion.AppVersionMapper;
 import cn.appsys.pojo.AppInfo;
+import cn.appsys.pojo.AppVersion;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.util.Date;
 import java.util.List;
 @Service
 public class AppInfoServiceImpl implements AppInfoService{
 
     @Resource
     private AppInfoMapper mapper;
+    @Resource
+    private AppVersionMapper appVersionMapper;
 
     @Override
     public List<AppInfo> getAppInfoList(String querySoftwareName, Integer queryStatus, Integer queryCategoryLevel1, Integer queryCategoryLevel2, Integer queryCategoryLevel3, Integer queryFlatformId, Integer devId, Integer currentPageNo, Integer pageSize) throws Exception {
@@ -34,5 +40,121 @@ public class AppInfoServiceImpl implements AppInfoService{
             flag = true;
         }
         return flag;
+    }
+
+    @Override
+    public boolean modify(AppInfo appInfo) throws Exception {
+        boolean flag = false;
+        if(mapper.modify(appInfo) > 0){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean deleteAppLogo(Integer id) throws Exception {
+        boolean flag = false;
+        if(mapper.deleteAppLogo(id) > 0){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean appsysdeleteAppById(Integer id) throws Exception {
+        boolean flag = false;
+        int versionCount = appVersionMapper.getVersionCountByAppId(id);
+        List<AppVersion> appVersionList = null;
+        if(versionCount > 0){//1 先删版本信息
+            //<1> 删除上传的apk文件
+            appVersionList = appVersionMapper.getAppVersionList(id);
+            for(AppVersion appVersion:appVersionList){
+                if(appVersion.getApkLocPath() != null && !appVersion.getApkLocPath().equals("")){
+                    File file = new File(appVersion.getApkLocPath());
+                    if(file.exists()){
+                        if(!file.delete())
+                            throw new Exception();
+                    }
+                }
+            }
+            //<2> 删除app_version表数据
+            appVersionMapper.deleteVersionByAppId(id);
+        }
+        //2 再删app基础信息
+        //<1> 删除上传的logo图片
+        AppInfo appInfo = mapper.getAppInfo(id, null);
+        if(appInfo.getLogoLocPath() != null && !appInfo.getLogoLocPath().equals("")){
+            File file = new File(appInfo.getLogoLocPath());
+            if(file.exists()){
+                if(!file.delete())
+                    throw new Exception();
+            }
+        }
+        //<2> 删除app_info表数据
+        if(mapper.deleteAppInfoById(id) > 0){
+            flag = true;
+        }
+        return flag;
+    }
+
+    @Override
+    public boolean appsysUpdateSaleStatusByAppId(AppInfo appInfoObj) throws Exception {
+     /*
+		 * 上架：
+			1 更改status由【2 or 5】 to 4 ， 上架时间
+			2 根据versionid 更新 publishStauts 为 2
+
+			下架：
+			更改status 由4给为5
+		 */
+
+        Integer operator = appInfoObj.getModifyBy();
+        if(operator < 0 || appInfoObj.getId() < 0 ){
+            throw new Exception();
+        }
+
+        //get appinfo by appid
+        AppInfo appInfo = mapper.getAppInfo(appInfoObj.getId(), null);
+        if(null == appInfo){
+            return false;
+        }else{
+            switch (appInfo.getStatus()) {
+                case 2: //当状态为审核通过时，可以进行上架操作
+                    onSale(appInfo,operator,4,2);
+                    break;
+                case 5://当状态为下架时，可以进行上架操作
+                    onSale(appInfo,operator,4,2);
+                    break;
+                case 4://当状态为上架时，可以进行下架操作
+                    offSale(appInfo,operator,5);
+                    break;
+
+                default:
+                    return false;
+            }
+        }
+        return true;
+    }
+    private void onSale(AppInfo appInfo,Integer operator,Integer appInfStatus,Integer versionStatus) throws Exception{
+        offSale(appInfo,operator,appInfStatus);
+        setSaleSwitchToAppVersion(appInfo,operator,versionStatus);
+    }
+    private boolean offSale(AppInfo appInfo,Integer operator,Integer appInfStatus) throws Exception{
+        AppInfo _appInfo = new AppInfo();
+        _appInfo.setId(appInfo.getId());
+        _appInfo.setStatus(appInfStatus);
+        _appInfo.setModifyBy(operator);
+        _appInfo.setOffSaleDate(new Date(System.currentTimeMillis()));
+        mapper.modify(_appInfo);
+        return true;
+    }
+    private boolean setSaleSwitchToAppVersion(AppInfo appInfo,Integer operator,Integer saleStatus) throws Exception{
+        AppVersion appVersion = new AppVersion();
+        appVersion.setId(appInfo.getVersionId());
+        appVersion.setPublishStatus(saleStatus);
+        appVersion.setModifyBy(operator);
+        appVersion.setModifyDate(new Date(System.currentTimeMillis()));
+        appVersionMapper.modify(appVersion);
+        return false;
     }
 }

@@ -22,7 +22,7 @@
 
                     <h1>APP信息管理系统</h1>
                     <div>
-                        <a class="btn btn-link" href="index.html">后台管理系统入口</a>
+                        <a class="btn btn-link" href="/manag/login">后台管理系统入口</a>
                     </div>
                     <br/>
                     <div>

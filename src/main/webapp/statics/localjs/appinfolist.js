@@ -61,6 +61,7 @@ $("#queryCategoryLevel2").change(function(){
 
 $(".addVersion").on("click",function(){
 	var obj = $(this);
+	alert(obj.attr("appinfoid"));
 	window.location.href="appversionadd?id="+obj.attr("appinfoid");
 });
 $(".modifyVersion").on("click",function(){
@@ -92,7 +93,7 @@ $(document).on("click",".saleSwichOpen,.saleSwichClose",function(){
 	var obj = $(this);
 	var appinfoid = obj.attr("appinfoid");
 	var saleSwitch = obj.attr("saleSwitch");
-	if("open" === saleSwitch){
+	if("open" === saleSwitch){//处于审核通过，已下架这两下状态的app
 		saleSwitchAjax(appinfoid,obj);
 	}else if("close" === saleSwitch){
 		if(confirm("你确定要下架您的APP应用【"+obj.attr("appsoftwarename")+"】吗？")){
@@ -104,24 +105,18 @@ $(document).on("click",".saleSwichOpen,.saleSwichClose",function(){
 var saleSwitchAjax = function(appId,obj){
 	$.ajax({
 		type:"PUT",
-		url:appId+"/sale.json",
+		url:appId+"/sale",
 		dataType:"json",
 		success:function(data){
-			/*
-			 * resultMsg:success/failed
-			 * errorCode:exception000001
-			 * appId:appId
-			 * errorCode:param000001
-			 */
 			if(data.errorCode === '0'){
 				if(data.resultMsg === "success"){//操作成功
 					if("open" === obj.attr("saleSwitch")){
-						//alert("恭喜您，【"+obj.attr("appsoftwarename")+"】的【上架】操作成功");
+						alert("恭喜您，【"+obj.attr("appsoftwarename")+"】的【上架】操作成功");
 						$("#appInfoStatus" + obj.attr("appinfoid")).html("已上架");
 						obj.className="saleSwichClose";
 						obj.html("下架");
 						obj.attr("saleSwitch","close");
-						$("#appInfoStatus" + obj.attr("appinfoid")).css({
+						$("#appInfoStatus" + obj.attr("appinfoid")).addClass({
 							'background':'green',
 							'color':'#fff',
 							'padding':'3px',
@@ -146,9 +141,9 @@ var saleSwitchAjax = function(appId,obj){
 					}
 				}else if(data.resultMsg === "failed"){//删除失败
 					if("open" === obj.attr("saleSwitch")){
-						alert("恭喜您，【"+obj.attr("appsoftwarename")+"】的【上架】操作失败");
+						alert("【"+obj.attr("appsoftwarename")+"】的【上架】操作失败");
 					}else if("close" === obj.attr("saleSwitch")){
-						alert("恭喜您，【"+obj.attr("appsoftwarename")+"】的【下架】操作失败");
+						alert("【"+obj.attr("appsoftwarename")+"】的【下架】操作失败");
 					}
 				}
 			}else{

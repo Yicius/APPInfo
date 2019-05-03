@@ -56,4 +56,29 @@ public interface AppInfoService {
      * @throws Exception
      */
     public boolean add(AppInfo appInfo) throws Exception;
+
+    /**
+     * 修改app信息
+     * @param appInfo
+     * @return
+     * @throws Exception
+     */
+    public boolean modify(AppInfo appInfo)throws Exception;
+    /**
+     * 删除logo图片
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public boolean deleteAppLogo(Integer id)throws Exception;
+
+    /**
+     * 通过appId删除app应用(app_info、app_version)
+     * @param id
+     * @return
+     * @throws Exception
+     */
+    public boolean appsysdeleteAppById(Integer id)throws Exception;
+
+    public boolean appsysUpdateSaleStatusByAppId(AppInfo appInfoObj) throws Exception;
 }

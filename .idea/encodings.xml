@@ -3,5 +3,6 @@
   <component name="Encoding" addBOMForNewFiles="with NO BOM">
     <file url="file://$PROJECT_DIR$" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/src/main/java/cn/appsys/tools/Constants.java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/src/main/webapp/jsp/backend/common/footer.jsp" charset="UTF-8" />
   </component>
 </project>
